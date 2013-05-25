@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Perspective</title>
+	<style>
+	body {
+		background-color: #000;
+		margin: 0px;
+		overflow: hidden;
+	}
+	#container {
+		display: none;
+		z-index: 0;
+	}
+	#ui {
+		color: white;
+		font-family: sans-serif;
+		z-index: 1;
+	}
+	.full, #intro, #instructions{
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		position: fixed;
+	}
+
+	#controls{
+		background-color: black;
+		opacity: 0.6;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 80px;
+		position: fixed;
+		font-size: 24px;
+	}
+
+	button.ui{
+		font-size: 24px;
+		padding: 10px;
+		width: 190px;
+		color: white;
+		background-color: #ccc;
+		border-radius: 15px;
+		text-shadow: #666 0 1px 2px;
+		display: inline-block;
+		border: none;
+	}
+
+	#intro-box{
+		margin: 0 auto;
+		height: 600px;
+		width: 600px;
+		margin-top: 160px;
+		background-color: #a3a3a3;
+		border-radius: 20px;
+	}
+	#endgame{
+		z-index: 5;
+		margin: 0 auto;
+		height: 600px;
+		width: 600px;
+		margin-top: 160px;
+		background-color: #a3a3a3;
+		text-align: center;
+		display: none;
+		border-radius: 20px;
+	}
+
+	#instructions{
+		background: #a3a3a3;
+		padding: 40px;
+		font-size: 20px;
+	}
+	#tool-container{
+		position: absolute;
+		float: right;
+		top: 20px;
+		right: 20px;
+	}
+	button.tool{
+		border-radius: 70px;
+		width: 70px;
+		height: 70px;
+		margin-left: 10px;
+		border: 3px solid #333;
+	}
+	button.selected{
+		border-color: red;
+	}
+	#tool{
+		top: 100px; left: 100px;
+		z-index: 2;
+		position: fixed;
+		display: none;
+		width: 100px;
+		height: 100px;
+		border-radius: 100px;
+		opacity: 0.7;
+	}
+
+	#interact{
+		display: none;
+		opacity: 0.6;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 120px;
+		position: fixed;
+	}
+
+	.blacktool{
+		background-color: black;
+		-webkit-box-shadow: 0 0 10px 10px white;
+	}
+
+	.whitetool{
+		background-color: white;
+		-webkit-box-shadow: 0 0 10px 10px gray;
+	}
+	</style>
+</head>
+<body>
+	<div id="container" class="full"></div>
+	<div id="ui" class="full">
+		<div id="intro" style="text-align: center; background-color: #bbb;">
+			<div id="intro-box">
+			<div style="font-size: 80px; padding-top: 60px;">Perspective</div>
+			<div style="font-size: 36px;">a virtual reality game</div>
+			<div style="font-size: 24px; margin-top: 40px;">Cyril Zhang</div>
+			<div style="font-size: 24px;">CPSC 478, Spring 2013</div>
+			<button style="margin-top: 40px;" onclick="beginGame();" class="ui">Play</button> <br/>
+			<button style="margin-top: 5px;" onclick="showInstructions();" class="ui">Instructions</button>
+			</div>
+		</div>
+		<div id="instructions" style="display:none;">
+			<div style="font-size: 40px">Instructions</div>
+
+			<p>You are the commander of a space station. The device you are holding is a window into space. You can change your perspective by rotating it in the real world.</p>
+
+			<p>The world contains various planets and asteroids. You gain points by colliding them together. Within 60 seconds, you wish to cause as much destruction as possible.<p>
+
+			<p>However, the world also contains a sentient, moving planet of interest, the <b style="color:blue">Earth</b>. The Earth will wander around errantly. It is your job to keep the Earth safe. When the Earth is safe, you will earn points. If the Earth receives damage, you will lose many points.<p>
+
+			<p>The Earth will be beneath you to start, so you should start with your tablet parallel to the ground.</p>
+
+			<p>You can interact with the world with two tools:</p>
+
+			<ul>
+				<li>A <b>gravity well</b>, which attracts all bodies.</li>
+				<li>An <b style="color:black;">antigravity well</b>, which repels all bodies.</li>
+			</ul>
+
+			<p>Use them wisely and efficiently, and you will be rewarded.</p>
+
+			<button onclick="hideInstructions();" class="ui">Return</button>
+
+		</div>
+		<div id="endgame">
+			<div style="font-size: 80px; padding-top: 100px">Time's up!</div>
+			<div style="font-size: 40px; padding-top: 40px; padding-bottom: 40px">Your score: <span id="finalscore">0</span></div>
+			<button onclick="endGame();" class="ui">Return</button>
+		</div>
+		<div id="controls" style="display:none;padding: 22px;">
+			<div>Time: <span id="timespan">60.00</span></div>
+			<div style="margin-top:12px;">Score: <span id="scorespan">0</span></div>
+			<div id="tool-container">
+				<button id="black" onclick="selectBlack();" class="tool selected" style="background-color:#060606;"></button>
+				<button id="white" onclick="selectWhite();" class="tool" style="background-color:#ccc;"></button>
+			</div>
+		</div>
+		<div id="interact">
+			<div id="tool" class="blacktool"></div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/three.min.js"></script>
+	<script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
+	<script type="text/javascript" src="js/gyro.js"></script>
+	<script type="text/javascript" src="js/game.js"></script>
+	<script type="text/javascript" src="js/graphics.js"></script>
+</body>
+</html>
